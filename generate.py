@@ -20,37 +20,29 @@ PROMPTS = [
 ]
 
 
-def generate_from_prompt(pipeline: FluxPipeline, prompt, output_path, verbose=False):
-    start = perf_counter()
+def generate_from_prompt(pipeline: FluxPipeline, prompt, steps, seed, output_path):
     image, _ = pipeline.generate_image(
         prompt,
         cfg_weight=CFG_WEIGHT,
         num_steps=steps,
-        seed=s,
+        seed=seed,
         latent_size=(HEIGHT // 8, WIDTH // 8),
         verbose=False,
     )
     image.save(output_path)
-    stop = perf_counter()
-    if verbose:
-        print(f"Saved prompt {i} with {steps} steps in {stop-start} seconds")
 
 
-def generate_from_image(pipeline: FluxPipeline, image_path, prompt, output_path, verbose=False):
-    start = perf_counter()
+def generate_from_image(pipeline: FluxPipeline, image_path, prompt, steps, seed, output_path):
     image, _ = pipeline.generate_image(
         prompt,
         cfg_weight=CFG_WEIGHT,
         num_steps=steps,
-        seed=s,
+        seed=seed,
         latent_size=(HEIGHT // 8, WIDTH // 8),
         verbose=False,
         image_path=image_path,
     )
     image.save(output_path)
-    stop = perf_counter()
-    if verbose:
-        print(f"Saved prompt {i} with {steps} steps in {stop-start} seconds")
 
 
 if __name__ == "__main__":
@@ -67,4 +59,4 @@ if __name__ == "__main__":
         s = random.randint(1, 99999)
         for steps in range(2, 6):
             output_path = f"images/prompt_{i}_steps_{steps}_seed_{s}.png"
-            generate_from_prompt(pipeline, prompt, output_path, verbose=True)
+            generate_from_prompt(pipeline, prompt, steps, s, output_path, verbose=True)
