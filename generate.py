@@ -10,7 +10,7 @@ logging.getLogger("diffusionkit.mlx.mmdit").setLevel(logging.WARNING)
 
 
 HEIGHT = 768
-WIDTH = 1360
+WIDTH = 1344
 CFG_WEIGHT = 0.0  # for FLUX.1-schnell, 5. for SD3
 
 
