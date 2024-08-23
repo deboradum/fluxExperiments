@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import random
+import re
 
 from diffusionkit.mlx import FluxPipeline
 
@@ -42,12 +43,25 @@ def generate_from_image(
     image.save(output_path)
 
 
+def extract_number(filename):
+    filename = os.path.basename(filename)
+    match = re.search(r"(\d+)", filename)
+    return int(match.group(1)) if match else 0
+
+
 def image_loop(
-    pipeline, initial_image_path, output_dir, loop_size, steps=10, denoise=0.7
+    pipeline, initial_image_path, output_dir, loop_size, steps=10, denoise=0.7, cont=False
 ):
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
+
+    # Calculate addition_constant for continuation of image loop generation.
+    addition_constant = max([extract_number(f"{output_dir}/{file}") for file in os.listdir(output_dir) if file.endswith(".png")], default=0)
+
     for i in range(1, loop_size):
+        if cont:
+            i += addition_constant
+
         im_path = f"{output_dir}/{i}.png"
         seed = random.randint(1, 99999)
         if i == 1:
@@ -120,6 +134,11 @@ def parse_arguments():
     loop_parser.add_argument(
         "--denoise", type=float, default=0.7, help="Denoising strength (default: 0.7)"
     )
+    loop_parser.add_argument(
+        "--cont",
+        action='store_true',
+        help="",
+    )
 
     return parser.parse_args()
 
@@ -144,8 +163,9 @@ if __name__ == "__main__":
             args.initial_image_path,
             args.output_dir,
             args.loop_size,
-            args.steps,
-            args.denoise,
+            steps=args.steps,
+            denoise=args.denoise,
+            cont=args.cont,
         )
     else:
         print("Invalid mode selected. Use 'prompt' or 'image_loop'.")
