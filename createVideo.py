@@ -5,6 +5,7 @@ import re
 from moviepy.editor import ImageSequenceClip
 
 def extract_number(filename):
+    filename = os.path.basename(filename)
     match = re.search(r"(\d+)", filename)
     return int(match.group(1)) if match else 0
 
