@@ -50,7 +50,7 @@ def extract_number(filename):
 
 
 def image_loop(
-    pipeline, initial_image_path, output_dir, loop_size, steps=10, denoise=0.7, cont=False
+    pipeline, initial_image_path, output_dir, loop_size, seed, steps=10, denoise=0.7, cont=False
 ):
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
@@ -58,12 +58,12 @@ def image_loop(
     # Calculate addition_constant for continuation of image loop generation.
     addition_constant = max([extract_number(f"{output_dir}/{file}") for file in os.listdir(output_dir) if file.endswith(".png")], default=0)
 
+    seed = random.randint(1, 99999)
     for i in range(1, loop_size):
         if cont:
             i += addition_constant
 
         im_path = f"{output_dir}/{i}.png"
-        seed = random.randint(1, 99999)
         if i == 1:
             generate_from_image(
                 pipeline,
@@ -134,6 +134,9 @@ def parse_arguments():
     loop_parser.add_argument(
         "--denoise", type=float, default=0.7, help="Denoising strength (default: 0.7)"
     )
+    prompt_parser.add_argument(
+        "--seed", type=int, default=None, help="Seed for generation (default: random)"
+    )
     loop_parser.add_argument(
         "--cont",
         action='store_true',
@@ -158,11 +161,13 @@ if __name__ == "__main__":
         seed = args.seed if args.seed is not None else random.randint(1, 99999)
         generate_from_prompt(pipeline, args.prompt, args.steps, seed, args.output_path)
     elif args.mode == "image_loop":
+        seed = args.seed if args.seed is not None else random.randint(1, 99999)
         image_loop(
             pipeline,
             args.initial_image_path,
             args.output_dir,
             args.loop_size,
+            seed,
             steps=args.steps,
             denoise=args.denoise,
             cont=args.cont,
