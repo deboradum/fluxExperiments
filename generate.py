@@ -134,7 +134,7 @@ def parse_arguments():
     loop_parser.add_argument(
         "--denoise", type=float, default=0.7, help="Denoising strength (default: 0.7)"
     )
-    prompt_parser.add_argument(
+    loop_parser.add_argument(
         "--seed", type=int, default=None, help="Seed for generation (default: random)"
     )
     loop_parser.add_argument(
